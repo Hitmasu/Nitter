@@ -15,7 +15,7 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>Mock</PackageTags>
-        <Version>0.0.1</Version>
+        <Version>0.0.2</Version>
         <RepositoryType>Git</RepositoryType>
     </PropertyGroup>
 
