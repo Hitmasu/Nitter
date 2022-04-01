@@ -2,53 +2,71 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Jitex;
+using Nitter.Interceptors;
 
 namespace Nitter
 {
     public class Nit
     {
-        private readonly object _instance;
         static Nit()
         {
             JitexManager.LoadModule<NitterModule>();
         }
 
-        protected Nit(object instance)
+        protected Nit()
         {
-            _instance = instance;
         }
 
-        public MethodIntercept On(MethodBase methodIntercept) => new MethodIntercept(methodIntercept, _instance);
-        public MethodIntercept<TResult> On<TResult>(MethodBase methodIntercept) => new MethodIntercept<TResult>(methodIntercept, _instance);
+        /// <summary>
+        /// Intercept a void method delegate
+        /// </summary>
+        /// <param name="del">Method group to intercept.</param>
+        /// <returns></returns>
+        public static MethodIntercept On(Delegate del) => On(del.Method);
+
+        /// <summary>
+        /// A intercept a void method.
+        /// </summary>
+        /// <param name="methodIntercept">Method to intercept</param>
+        /// <returns></returns>
+        public static MethodIntercept On(MethodBase methodIntercept) => new(methodIntercept);
+
+        /// <summary>
+        /// Intercept a non-void method.
+        /// </summary>
+        /// <param name="methodIntercept">Method to intercept</param>
+        /// <typeparam name="TResult">Type from return.</typeparam>
+        /// <returns></returns>
+        public static MethodIntercept<TResult> On<TResult>(MethodBase methodIntercept) => new(methodIntercept);
+
+
+        /// <summary>
+        /// Intercept a non-void method delegate
+        /// </summary>
+        /// <param name="del">Method group to intercept.</param>
+        /// <returns></returns>
+        public static MethodIntercept<TResult> On<TResult>(Delegate del) => On<TResult>(del.Method);
     }
 
     public class Nit<T> : Nit
     {
-        public Nit(T instance) : base(instance){}
-
-        public MethodIntercept On(Expression<Action<T>> expression) => On(expression.ToMethodBase());
-        public MethodIntercept<TResult> On<TResult>(Expression<Func<T, TResult>> expression) => On<TResult>(expression.ToMethodBase());
-    }
-
-    public class NitEx
-    {
-        static NitEx()
+        private Nit()
         {
-            JitexManager.LoadModule<NitterModule>();
         }
 
-        protected NitEx() { }
-
-        public static MethodIntercept On(MethodBase methodIntercept) => new MethodIntercept(methodIntercept);
-        public static MethodIntercept<TResult> On<TResult>(MethodBase methodIntercept) => new MethodIntercept<TResult>(methodIntercept);
-
-        public static MethodIntercept On(MethodBase methodIntercept, object instance) => new MethodIntercept(methodIntercept, instance);
-        public static MethodIntercept<TResult> On<TResult>(MethodBase methodIntercept, object instance) => new MethodIntercept<TResult>(methodIntercept, instance);
-    }
-
-    public class NitEx<T> : NitEx
-    {
+        /// <summary>
+        /// Intercept a void method
+        /// </summary>
+        /// <param name="expression"> Method to intercept</param>
+        /// <returns></returns>
         public static MethodIntercept On(Expression<Action<T>> expression) => On(expression.ToMethodBase());
+
+        /// <summary>
+        /// Intercept a non-void method.
+        /// </summary>
+        /// <param name="expression">Method to intercept</param>
+        /// <typeparam name="TResult">Type from return.</typeparam>
+        /// <returns></returns>
         public static MethodIntercept<TResult> On<TResult>(Expression<Func<T, TResult>> expression) => On<TResult>(expression.ToMethodBase());
     }
 }

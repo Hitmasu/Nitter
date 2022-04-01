@@ -1,87 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using Jitex;
 using Jitex.Intercept;
+using Jitex.JIT.Context;
 using Jitex.Utils;
+using Nitter.Interceptors;
 
 namespace Nitter
 {
     public abstract class MethodInterceptBase
     {
-        static MethodInterceptBase()
+        private static readonly Dictionary<MethodBase, Parameters?> MethodInterceptors = new();
+
+        public MethodBase Method { get; }
+
+        protected MethodInterceptBase(MethodBase method)
         {
-            JitexManager.AddInterceptor(InterceptorCallAsync);
+            //TODO: Move out of constructor
+            Method = MethodHelper.GetOriginalMethod(method);
+            MethodInterceptors.Add(Method, null);
         }
 
-        private static readonly Dictionary<MethodBase, IList<InterceptFilter>> MethodInterceptors = new Dictionary<MethodBase, IList<InterceptFilter>>();
+        internal static bool ShouldIntercept(MethodContext context) => MethodInterceptors.ContainsKey(context.Method);
 
-        private readonly MethodBase _origin;
-        private readonly object _instance;
-
-        protected MethodInterceptBase(MethodBase origin)
+        internal static Parameters? GetParameters(CallContext context)
         {
-            _origin = MethodHelper.GetOriginalMethod(origin);
+            MethodInterceptors.TryGetValue(context.Method, out Parameters? parameters);
+            return parameters;
         }
 
-        protected MethodInterceptBase(MethodBase origin, object instance)
+        protected void AddInterceptor(Delegate methodToCall, bool isAsync)
         {
-            _origin = MethodHelper.GetOriginalMethod(origin);
-            _instance = instance;
+            Parameters parameters = GetOrInitializeParameters();
+            parameters.Interceptor = methodToCall;
+            parameters.IsAsync = isAsync;
         }
 
-        protected void PrepareMethod(Delegate methodToCall)
+        private Parameters GetOrInitializeParameters()
         {
-            InterceptFilter filter = new InterceptFilter(methodToCall, _instance);
-            if (MethodInterceptors.TryGetValue(_origin, out IList<InterceptFilter> filters))
+            if (!MethodInterceptors.TryGetValue(Method, out Parameters? parameters))
+                throw new NullReferenceException();
+
+            if (parameters == null)
             {
-                filters.Add(filter);
-            }
-            else
-            {
-                MethodInterceptors.Add(_origin, new List<InterceptFilter> { filter });
-            }
-
-        }
-
-        internal static bool IsToIntercept(MethodBase methodToCompile)
-        {
-            MethodBase originalMethod = MethodHelper.GetOriginalMethod(methodToCompile);
-            return MethodInterceptors.ContainsKey(originalMethod);
-        }
-
-        private static async ValueTask InterceptorCallAsync(CallContext context)
-        {
-            MethodBase originalMethod = MethodHelper.GetOriginalMethod(context.Method);
-
-            if (!MethodInterceptors.TryGetValue(originalMethod, out IList<InterceptFilter> filters))
-                return;
-
-            Delegate delegateToCall = default;
-
-            foreach (InterceptFilter filter in filters)
-            {
-                if (filter.Instance == context.Instance)
-                    delegateToCall = filter.Delegate;
+                parameters = new Parameters();
+                MethodInterceptors[Method] = parameters;
             }
 
-            if (delegateToCall == null)
-            {
-                InterceptFilter filter = filters.FirstOrDefault(w => w.Instance == null);
-
-                if (filter != null)
-                    delegateToCall = filter.Delegate;
-                else
-                    return;
-            }
-
-            object[] parameters = context.HasParameters ? context.Parameters!.Select(w => w.Value).ToArray() : new object[0];
-            object returnValue = delegateToCall.DynamicInvoke(parameters);
-
-            if (context.HasReturn)
-                context.ReturnValue = returnValue;
+            return parameters;
         }
     }
 }

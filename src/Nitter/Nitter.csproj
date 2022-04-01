@@ -1,12 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AssemblyName>Nitter</AssemblyName>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <AssemblyName>Nitter</AssemblyName>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <Platforms>x64</Platforms>
+        <Authors>Hitmasu</Authors>
+        <Company/>
+        <Description>A easy mock/interceptor to .NET.</Description>
+        <PackageProjectUrl>https://github.com/Hitmasu/Nitter</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Hitmasu/Nitter</RepositoryUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>Mock</PackageTags>
+        <Version>0.0.1</Version>
+        <RepositoryType>Git</RepositoryType>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Jitex" Version="6.1.2" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Jitex" Version="6.5.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Jitex\src\Jitex\Jitex.csproj"/>
+    </ItemGroup>
 
 </Project>
