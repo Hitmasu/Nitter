@@ -1,0 +1,54 @@
+name: Nitter Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [assigned, opened, synchronize, reopened]
+  release:
+    types:
+      - published
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  NUGET_KEY: ${{ secrets.NUGET_KEY }}
+
+defaults:
+  run:
+    working-directory: src
+
+jobs:
+  publish:
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Installing .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - run: |
+          dotnet clean && dotnet nuget locals all --clear
+          dotnet restore
+
+      - name: Building Nitter
+        run: |
+          cd Nitter
+          dotnet publish -c Release
+          cd ..
+
+      - name: Creating Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./Nitter/bin/Release/*.nupkg
+
+      - name: Publishing Nitter on Nuget
+        run: dotnet nuget push ./Nitter/bin/Release/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
