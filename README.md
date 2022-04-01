@@ -8,7 +8,7 @@ Nitter is just a abstraction for [Jitex](https://github.com/Hitmasu/Jitex).
 
 ## Introducing
 
-To mock a method, just pass your on method on `Nit.On` to prepare method to be mocked/intercepted. If your method is a non-void, you should call `Nit.On<TResult>` passing return type on `TResult`.
+To mock a method, just pass your method on `Nit.On` to prepare method to be mocked/intercepted. If your method is a non-void, you should call `Nit.On<TResult>` passing return type on `TResult`.
 
 After prepare method, call `DoAsync` passing your interceptor/mock method. Like `Nit.On`, if your method as parameters, just call `DoAsync<>` passing type from parameters. 
 
