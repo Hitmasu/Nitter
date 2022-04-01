@@ -1,8 +1,8 @@
 # Nitter [![Nuget](https://img.shields.io/nuget/v/Nitter)](https://www.nuget.org/packages/Nitter/)
 
-Nitter is a library to allow you mock any method on .NET.  
+Nitter is a library to allow you mock/intercept any method on .NET.  
 
-Don't need interfaces, abstract or to be "virtual". 
+Don't need interfaces, abstract or be "virtual". 
 
 Nitter is just a abstraction for [Jitex](https://github.com/Hitmasu/Jitex).
 
@@ -123,10 +123,6 @@ public class MathUtils
 To intercept a non-public method, just pass the MethodBase from method you want:
 
 ```c#
-using System;
-using System.Reflection;
-using Nitter;
-
 MethodBase methodSum = typeof(MathUtils).GetMethod("PrivateSum", BindingFlags.NonPublic | BindingFlags.Static);
 
 Nit.On<int>(methodSum)
@@ -137,7 +133,6 @@ Nit.On<int>(methodSum)
 
 int sum = MathUtils.Sum(10, 10);
 Console.WriteLine(sum); //Output is 100.
-Console.ReadKey();
 
 public class MathUtils
 {
