@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Jitex;
+using Jitex.Utils;
 using Nitter.Interceptors;
 
 namespace Nitter
@@ -30,6 +31,17 @@ namespace Nitter
         /// <param name="methodIntercept">Method to intercept</param>
         /// <returns></returns>
         public static MethodIntercept On(MethodBase methodIntercept) => new(methodIntercept);
+        
+        /// <summary>
+        /// Intercept a non-void method
+        /// </summary>
+        /// <param name="expression">Method to intercept.</param>
+        /// <returns></returns>
+        public static MethodIntercept On(Expression<Action> expression)
+        {
+            MethodBase method = expression.ToMethodBase();
+            return On(method);
+        }
 
         /// <summary>
         /// Intercept a non-void method.
@@ -46,6 +58,17 @@ namespace Nitter
         /// <param name="del">Method group to intercept.</param>
         /// <returns></returns>
         public static MethodIntercept<TResult> On<TResult>(Delegate del) => On<TResult>(del.Method);
+        
+        /// <summary>
+        /// Intercept a non-void method
+        /// </summary>
+        /// <param name="expression">Method to intercept.</param>
+        /// <returns></returns>
+        public static MethodIntercept<TResult> On<TResult>(Expression<Func<TResult>> expression)
+        {
+            MethodBase method = expression.ToMethodBase();
+            return On<TResult>(method);
+        }
     }
 
     public class Nit<T> : Nit

@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using Jitex.Intercept;
+using Jitex.Utils;
 
 namespace Nitter.Interceptors;
 

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 using Jitex.Intercept;
 using Jitex.JIT.Context;
 using Jitex.Utils;
-using Nitter.Interceptors;
 
 namespace Nitter
 {
@@ -52,6 +52,11 @@ namespace Nitter
             Parameters parameters = GetOrInitializeParameters();
             parameters.Interceptor = methodToCall;
             parameters.IsAsync = isAsync;
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                MethodHelper.DisableReadyToRun(Method);
+            
+            MethodHelper.ForceRecompile(Method);
         }
 
         private Parameters GetOrInitializeParameters()
