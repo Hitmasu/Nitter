@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Jitex;
-using Jitex.Utils;
 using Nitter.Interceptors;
 
 namespace Nitter
