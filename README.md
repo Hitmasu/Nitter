@@ -6,6 +6,18 @@ Don't need interfaces, abstract or be "virtual".
 
 Nitter is just a abstraction for [Jitex](https://github.com/Hitmasu/Jitex).
 
+```cs
+using System;
+using Nitter;
+
+Nit.On(() => Math.Max(1, 1))
+    .DoAsync<int, int>(async (val1, val2, context) => 100);
+
+int result = Math.Max(20, 30); //Result is 100
+```
+
+
+
 ## Introducing
 
 To mock a method, just pass your method on `Nit.On` to prepare method to be mocked/intercepted. If your method is a non-void, you should call `Nit.On<TResult>` passing return type on `TResult`.
